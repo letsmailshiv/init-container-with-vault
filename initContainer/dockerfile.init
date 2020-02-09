@@ -1,0 +1,25 @@
+FROM vault:latest
+
+ENV USER=appusr
+ENV UID=12345
+ENV GID=23456
+ENV HOME=/caa
+
+RUN addgroup --gid "$GID" "$USER" \
+    && adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "$HOME" \
+    --ingroup "$USER" \
+    --uid "$UID" \
+    "$USER"
+
+COPY init.sh $HOME/init.sh
+RUN chmod +x $HOME/init.sh && \
+    chown -R ${USER}:${USER} "$HOME"
+
+USER $USER
+WORKDIR "$HOME"
+
+
+ENTRYPOINT ["sh","-c","$HOME/init.sh"]
